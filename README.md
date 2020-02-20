@@ -11,3 +11,9 @@ The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of
 5. Run `start_scraping()` to strat scrapping. The function currently produces the following files: `LIHKGr.RData` which saves the workspace, `lihkg_df.rds` and `lihkg_df.csv` which save the dataframe as .rds and .csv respectively, and `lihkg_df_postid.txt` which save the last scraped post id.
 
 If the browser has crashed, repeat step 4 and 5. If R has crashed, read in `LIHKGr.RData` and repeat step 4 and 5.
+
+## Known Issues / To-do List
+
+* Create arguments for sepecifying file outputs.
+* Debug error scrapping empty last page
+* Debug error scraping hidden posts
