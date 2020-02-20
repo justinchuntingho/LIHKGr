@@ -16,6 +16,7 @@ If the browser has crashed, repeat step 4 and 5. If R has crashed, read in `LIHK
 
 ## Known Issues / To-do List
 
-* Create arguments for sepecifying file outputs.
+* Create R package using devtools
+* Create arguments for specifying file outputs.
 * Debug error scrapping empty last page
 * Debug error scraping hidden posts
