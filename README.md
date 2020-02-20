@@ -20,3 +20,11 @@ If the browser has crashed, repeat step 4 and 5. If R has crashed, read in `LIHK
 * Create arguments for specifying file outputs.
 * Debug error scrapping empty last page
 * Debug error scraping hidden posts
+
+## Contributors
+
+* Justin Chun-ting Ho
+* Nick H. K. Or
+
+## Citation
+Ho, J.C. & Or, N.H.K. (2020). LIHKGr. An application for scraping LIHKG. Source code and releases available at https://github.com/justinchuntingho/LIHKGr.
