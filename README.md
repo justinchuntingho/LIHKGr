@@ -1,7 +1,7 @@
 ![LIHKGr](lihkgr.png)
 
 # LIHKGr
-The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of Reddit, for analysis. LIHKG has gained popularity in 2016 and become a popular research data source during recent years. LIHKG is currently protected by Google's reCAPTCHA, this package currently builds on `rselenium` and adopts a semi-manual approach to bypass it.
+The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of Reddit, for analysis. LIHKG has gained popularity in 2016 and become a popular research data source during recent years. LIHKG is currently protected by Google's reCAPTCHA, this package currently builds on `RSelenium` and adopts a semi-manual approach to bypass it.
 
 ## Instructions
 `lihkgr.R` contains all the required functions. Please install the following packages: `RSelenium`, `raster`, `magrittr`, and `rvest` and follow the following workflows:
