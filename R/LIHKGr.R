@@ -15,8 +15,8 @@ init_scraper <- function(startn, stopn, windows = FALSE){
   failed <<- c()
 }
 
-launch_browser <- function(browser=c("chrome"), chromever = "77.0.3865.40", port = sample(1000:60000, 1)){
-  driver <<- rsDriver(browser=browser, chromever = chromever, port = port)
+launch_browser <- function(browser='firefox', port = sample(1000:60000, 1)){
+  driver <<- rsDriver(browser=browser, port = port)
   remote_driver <<- driver[["client"]]
   remote_driver$navigate("https://lihkg.com")
 }
@@ -150,7 +150,7 @@ start_scraping <- function(){
 
 ################ Step 1: Set Up (Only do once) ################
 # You have to set the working directory
-setwd("################")
+setwd(tempdir())
 # Only run the following ONCE, as this will remove all the data
 init_scraper(startn = 1610753, stopn = 1610755, windows = FALSE)
 
@@ -161,3 +161,165 @@ launch_browser()
 ################ Step 3: Start Scraping ################
 start_scraping()
 # Note: If your scraping stopped, run this again, it will continue automatically
+
+
+
+
+#########
+### R6 version
+require(R6)
+library(RSelenium)
+library(raster)
+library(magrittr)
+library(rvest)
+
+.lay_low <- function(){
+  Sys.sleep(sample(seq(1, 2, by=0.001), 1))
+}
+
+
+.gen_remote_driver <- function(browser, port = sample(1000:60000, 1)) {
+    driver <- rsDriver(browser = browser, port = port)
+    remote_driver <- driver[["client"]]
+    remote_driver$navigate("https://lihkg.com")
+    return(remote_driver)
+}
+
+.crack_it <- function(url, remote_driver){
+    remote_driver$navigate(url)
+    Sys.sleep(sample(seq(3, 5, by=0.001), 1))
+    html <- remote_driver$getPageSource()
+    if(grepl("recaptcha_widget", html[[1]])){
+        readline(prompt="Captcha Detected. Press [enter] to continue after solving")
+    }
+    pg <-  read_html(html[[1]])
+    return(pg)
+}
+
+.scrape_page <- function(html, postid){
+    ##get_number
+    number <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("div div small ._3SqN3KZ8m8vCsD9FNcxcki") %>%
+        html_text()
+    ##get_date
+    date <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("div div small .Ahi80YgykKo22njTSCzs_") %>%
+        html_attr("data-tip")
+    ##get_uid
+    uid <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("div div small .ZZtOrmcIRcvdpnW09DzFk a") %>%
+        html_attr('href')
+    ##get_text
+    text <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("div div .GAagiRXJU88Nul1M7Ai0H ._2cNsJna0_hV8tdMj3X6_gJ") %>%
+        html_text()
+    ##get_upvote
+    upvote <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("._1jvTHwVJobs9nsM0JDYqKB+ ._1drI9FJC8tyquOpz5QRaqf") %>% html_text()
+    ##get_downvote
+    downvote <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("._2_VFV1QOZok8YhOTGa_3h9+ ._1drI9FJC8tyquOpz5QRaqf") %>% html_text()
+    ##get_collection_time
+    collection_time <- Sys.time()
+    ##get_title
+    top.text <- html %>% html_nodes("._2k_IfadJWjcLJlSKkz_R2- span") %>%
+        html_text()
+    title <- top.text[2]
+    board <- top.text[1]
+    newdf <- as.data.frame(cbind(number, date, uid, text, upvote, downvote))
+    newdf$postid <- postid # This bit might fail if date etc is NULL
+    newdf$title <- title
+    newdf$board <- board
+    newdf$collection_time <- collection_time
+    return(newdf)
+}
+
+### TODO IT IS BETTER TO USE TIBBLE
+.scrape_post <- function(postid, remote_driver) {
+  posts <- c()
+  for(i in 1:999){
+    attempt <- 1
+    notdone <- TRUE
+    nextpage <- FALSE
+
+    while( notdone && attempt <= 4 ) { # Auto restart when fails
+      print(paste0("Attempt: ", attempt))
+      attempt <- attempt + 1
+      try({
+        html <- .crack_it(paste0("https://lihkg.com/thread/", postid, "/page/", i), remote_driver)
+        next.page <- html %>% html_node("._3omJTNzI7U7MErH1Cfr3gE+ ._3omJTNzI7U7MErH1Cfr3gE a") %>% html_text()
+        titlewords <- html %>% html_nodes("._2k_IfadJWjcLJlSKkz_R2- span") %>% html_text() %>% length()
+        if ("下一頁" %in% next.page){
+            print(paste0("page ", i, " (to be continued)"))
+            post <- .scrape_page(html, postid)
+            posts <- rbind(posts, post)
+            nextpage <- TRUE
+            notdone <- FALSE
+        } else if (titlewords == 1){
+            notdone <- FALSE
+            posts <- data.frame(number = "ERROR", date = "ERROR", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Post", board = "ERROR", collection_time = Sys.time())
+            print("Empty Post, Skipping")
+        } else {
+            print(paste0("page ", i, " (last page)"))
+            post <- .scrape_page(html, postid)
+            posts <- rbind(posts, post)
+            notdone <- FALSE
+        }
+        .lay_low()
+      })
+    } # End of While Loop
+    if( notdone && attempt > 4 ){
+        if (titlewords == 2 && nrow(posts) > 1){
+            warning <- data.frame(number = "EMPTY LAST PAGE", date = "EMPTY LAST PAGE", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Last Page", board = "ERROR", collection_time = Sys.time())
+            posts <- rbind(posts, warning)
+            print("Empty Last Page Detected")
+            notdone <- FALSE
+        } else {
+            stop("Error, Stopping")
+        }
+    }
+    if(nextpage){
+        next
+    }else if(!notdone){
+        break
+    }
+  } # End of For Loop
+  return(posts)
+}
+
+
+
+
+
+Lihkg_reader <- R6::R6Class(
+    "oolong_reader",
+    public = list(
+        initialize = function(browser = "firefox", port = sample(1000:60000, 1)) {
+            private$remote_driver <- .gen_remote_driver(browser, port)
+        },
+        scrape = function(postid) {
+            private$bag <- rbind(private$bag, .scrape_post(postid, private$remote_driver))
+        },
+        save = function(file_name) {
+            saveRDS(private$bag, file_name)
+        },
+        finalize = function() {
+            private$remote_driver$close()
+            private$remote_driver <- NULL
+        }),
+    private = list(
+        remote_driver = NULL,
+        bag = tibble::tibble()
+    )
+)
+
+lihkg <- Lihkg_reader$new()
+lihkg$scrape(1891333)
+lihkg$scrape(1890500)
+lihkg$save("lihkg.RDS")
+lihkg$finalize()
+
+### The massive scraping should be similar, just purrr::map_dfr a bunch of postid.
+### put everything in the bag, and then save.
+### we can have one more private slot for failed postid.
+### Add a method to retry all those failed postid.
