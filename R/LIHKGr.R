@@ -25,6 +25,14 @@ library(rvest)
 .crack_it <- function(url, remote_driver){
     remote_driver$navigate(url)
     Sys.sleep(sample(seq(3, 5, by=0.001), 1))
+    # Click collapsed comments
+    collapsed <- remote_driver$findElements("xpath", "//div[@class='_1d3Z5jQRq3WnuIm0hnMh0c']")
+    if (length(collapsed)) {
+      for (x in collapsed) {
+        x$clickElement()
+        Sys.sleep(sample(seq(3, 5, by=0.001), 1))
+      }
+    }
     html <- remote_driver$getPageSource()
     if(grepl("recaptcha_widget", html[[1]])){
         readline(prompt="Captcha Detected. Press [enter] to continue after solving")
