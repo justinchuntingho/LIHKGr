@@ -56,6 +56,12 @@ library(rvest)
     uid <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
         html_node("div div small .ZZtOrmcIRcvdpnW09DzFk a") %>%
         html_attr('href')
+    ##get_probation
+    probation <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+    html_node("div div small ._10ZVxePYNpBeLjzkQ88wtj") %>%
+    html_text() %>%
+    is.na() %>%
+    not()
     ##get_text
     text <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
         html_node("div div .GAagiRXJU88Nul1M7Ai0H ._2cNsJna0_hV8tdMj3X6_gJ") %>%
