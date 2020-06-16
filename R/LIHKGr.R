@@ -109,7 +109,7 @@ library(rvest)
             notdone <- FALSE
         } else if (titlewords == 1){
             notdone <- FALSE
-            posts <- tibble::tibble(number = "ERROR", date = "ERROR", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Post", board = "ERROR", collection_time = Sys.time())
+            posts <- tibble::tibble(number = "ERROR", date = "ERROR", uid = "ERROR", probation = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Post", board = "ERROR", collection_time = Sys.time())
             print("Empty Post, Skipping")
         } else {
             print(paste0("page ", i, " (last page)"))
@@ -122,7 +122,7 @@ library(rvest)
     } # End of While Loop
     if( notdone && attempt > 4 ){
         if (titlewords == 2 && nrow(posts) > 1){
-            warning <- tibble::tibble(number = "EMPTY LAST PAGE", date = "EMPTY LAST PAGE", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Last Page", board = "ERROR", collection_time = Sys.time())
+            warning <- tibble::tibble(number = "EMPTY LAST PAGE", date = "EMPTY LAST PAGE", uid = "ERROR", probation = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Last Page", board = "ERROR", collection_time = Sys.time())
             posts <- dplyr::bind_rows(posts, warning)
             print("Empty Last Page Detected")
             notdone <- FALSE
