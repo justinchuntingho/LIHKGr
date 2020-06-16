@@ -171,7 +171,7 @@ Lihkg_reader <- R6::R6Class(
             }
             self$scrape_alot(private$failed)
         },
-        empty = function() {
+        clear = function() {
             self$bag <- tibble::tibble()
         },
         finalize = function() {
