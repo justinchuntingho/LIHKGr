@@ -27,10 +27,9 @@ library(rvest)
     Sys.sleep(sample(seq(3, 5, by=0.001), 1))
     collapsed <- remote_driver$findElements("xpath", "//div[@class='_1d3Z5jQRq3WnuIm0hnMh0c']")
     if (length(collapsed)) { # click collapsed comments if any
-      for (x in collapsed) {
-        x$clickElement()
-        Sys.sleep(sample(seq(3, 5, by=0.001), 1))
-      }
+        for (x in collapsed) {
+            x$clickElement()
+        }
     }
     html <- remote_driver$getPageSource()
     if(grepl("recaptcha_widget", html[[1]])){
@@ -38,7 +37,7 @@ library(rvest)
     }
     pg <-  read_html(html[[1]])
     if (length(collapsed)) { # remove any additional page accidentally loaded when clicking collapsed comments
-      xml_remove(xml_find_all(pg, "//div[@class='_3jxQCFWg9LDtkSkIVLzQ8L']")[-1])
+        xml_remove(xml_find_all(pg, "//div[@class='_3jxQCFWg9LDtkSkIVLzQ8L']")[-1])
     }
     return(pg)
 }
@@ -58,10 +57,10 @@ library(rvest)
         html_attr('href')
     ##get_probation
     probation <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
-    html_node("div div small ._10ZVxePYNpBeLjzkQ88wtj") %>%
-    html_text() %>%
-    is.na() %>%
-    not()
+        html_node("div div small ._10ZVxePYNpBeLjzkQ88wtj") %>%
+        html_text() %>%
+        is.na() %>%
+        not()
     ##get_text
     text <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
         html_node("div div .GAagiRXJU88Nul1M7Ai0H ._2cNsJna0_hV8tdMj3X6_gJ") %>%
