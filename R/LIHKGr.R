@@ -34,6 +34,7 @@ library(rvest)
     html <- remote_driver$getPageSource()
     if(grepl("recaptcha_widget", html[[1]])){
         readline(prompt="Captcha Detected. Press [enter] to continue after solving")
+        return(.crack_it(url, remote_driver)) # make sure collapsed comments are expanded
     }
     pg <-  read_html(html[[1]])
     if (length(collapsed)) { # remove any additional page accidentally loaded when clicking collapsed comments
