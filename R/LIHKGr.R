@@ -25,11 +25,21 @@ library(rvest)
 .crack_it <- function(url, remote_driver){
     remote_driver$navigate(url)
     Sys.sleep(sample(seq(3, 5, by=0.001), 1))
+    collapsed <- remote_driver$findElements("xpath", "//div[@class='_1d3Z5jQRq3WnuIm0hnMh0c']")
+    if (length(collapsed)) { # click collapsed comments if any
+        for (x in collapsed) {
+            x$clickElement()
+        }
+    }
     html <- remote_driver$getPageSource()
     if(grepl("recaptcha_widget", html[[1]])){
         readline(prompt="Captcha Detected. Press [enter] to continue after solving")
+        return(.crack_it(url, remote_driver)) # make sure collapsed comments are expanded
     }
     pg <-  read_html(html[[1]])
+    if (length(collapsed)) { # remove any additional page accidentally loaded when clicking collapsed comments
+        xml_remove(xml_find_all(pg, "//div[@class='_3jxQCFWg9LDtkSkIVLzQ8L']")[-1])
+    }
     return(pg)
 }
 
@@ -46,6 +56,12 @@ library(rvest)
     uid <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
         html_node("div div small .ZZtOrmcIRcvdpnW09DzFk a") %>%
         html_attr('href')
+    ##get_probation
+    probation <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
+        html_node("div div small ._10ZVxePYNpBeLjzkQ88wtj") %>%
+        html_text() %>%
+        is.na() %>%
+        not()
     ##get_text
     text <- html %>% html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
         html_node("div div .GAagiRXJU88Nul1M7Ai0H ._2cNsJna0_hV8tdMj3X6_gJ") %>%
@@ -63,7 +79,7 @@ library(rvest)
         html_text()
     title <- top.text[2]
     board <- top.text[1]
-    newdf <- tibble::as_tibble(cbind(number, date, uid, text, upvote, downvote))
+    newdf <- tibble::as_tibble(cbind(number, date, uid, probation, text, upvote, downvote))
     newdf$postid <- postid # This bit might fail if date etc is NULL
     newdf$title <- title
     newdf$board <- board
@@ -93,7 +109,7 @@ library(rvest)
             notdone <- FALSE
         } else if (titlewords == 1){
             notdone <- FALSE
-            posts <- tibble::tibble(number = "ERROR", date = "ERROR", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Post", board = "ERROR", collection_time = Sys.time())
+            posts <- tibble::tibble(number = "ERROR", date = "ERROR", uid = "ERROR", probation = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Post", board = "ERROR", collection_time = Sys.time())
             print("Empty Post, Skipping")
         } else {
             print(paste0("page ", i, " (last page)"))
@@ -106,7 +122,7 @@ library(rvest)
     } # End of While Loop
     if( notdone && attempt > 4 ){
         if (titlewords == 2 && nrow(posts) > 1){
-            warning <- tibble::tibble(number = "EMPTY LAST PAGE", date = "EMPTY LAST PAGE", uid = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Last Page", board = "ERROR", collection_time = Sys.time())
+            warning <- tibble::tibble(number = "EMPTY LAST PAGE", date = "EMPTY LAST PAGE", uid = "ERROR", probation = "ERROR", text = "ERROR", upvote = "ERROR", downvote = "ERROR", postid = postid, title = "Deleted Last Page", board = "ERROR", collection_time = Sys.time())
             posts <- dplyr::bind_rows(posts, warning)
             print("Empty Last Page Detected")
             notdone <- FALSE
@@ -128,7 +144,7 @@ library(rvest)
 
 
 Lihkg_reader <- R6::R6Class(
-    "oolong_reader",
+    "lihkg_reader",
     public = list(
         initialize = function(...) {
             res <- .gen_remote_driver(...)
@@ -155,9 +171,12 @@ Lihkg_reader <- R6::R6Class(
             }
             self$scrape_alot(private$failed)
         },
+        clear = function() {
+            self$bag <- tibble::tibble()
+        },
         finalize = function() {
             private$remote_driver$close()
-            private$driver[["client"]]$stop()            
+            private$driver[["server"]]$stop()            
         },
         bag = tibble::tibble()
         ),
