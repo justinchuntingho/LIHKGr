@@ -1,23 +1,51 @@
-![LIHKGr](lihkgr.png)
 
-# LIHKGr
+# LIHKGr <img src="lihkgr.png" align="right" height="200" />
 The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of Reddit, for analysis. LIHKG has gained popularity in 2016 and become a popular research data source during recent years. LIHKG is currently protected by Google's reCAPTCHA, this package currently builds on `RSelenium` and adopts a semi-manual approach to bypass it.
 
 ## Instructions
-`lihkgr.R` contains all the required functions. Please install the following packages: `RSelenium`, `raster`, `magrittr`, and `rvest` and follow the following workflows:
+`lihkgr.R` contains all the required functions. Please install the following packages: `RSelenium`, `raster`, `magrittr` `rvest`, and `purrr`. Follow the following workflow:
 
-1. Run the R sciprt to load the packages and define all the functions.
-2. Set working directory, temporary files will be stored here.
-3. Run `init_scraper()` to initiate scraper. Specify the range of post ids to scrape.
-4. Run `launch_browser()` and solve reCAPTCHA when needed. The default browser is Chrome (77.0.3865.40), change browser and version if neccessary. This function builts on `RSelenium::rsDriver()`, see help file for more information about supported browsers.
-5. Run `start_scraping()` to strat scrapping. The function currently produces the following files: `LIHKGr.RData` which saves the workspace, `lihkg_df.rds` and `lihkg_df.csv` which save the dataframe as .rds and .csv respectively, and `lihkg_df_postid.txt` which save the last scraped post id.
+### Step 1: Create a scraper
 
-If the browser has crashed, repeat step 4 and 5. If R has crashed, read in `LIHKGr.RData` and repeat step 4 and 5.
+```r
+## Creating a Firefox instance with a random port.
+
+lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1), verbose = FALSE)
+```
+
+### Step 2: Scrape
+
+```r
+lihkg$scrape(1891333)
+lihkg$scrape_alot(1610753:1610755)
+```
+
+### Step 2.1: If any post id cannot be scraped, retry
+
+```r
+lihkg$retry()
+```
+
+### Step 3: Get / Save the data
+
+```r
+lihkg$bag
+lihkg$save("lihkg.RDS")
+
+### If you don't want to save the data as RDS, you can just save the bag as any format you like. It is just a regular data frame / tibble.
+
+rio::export(lihkg$bag, "lihkg.xlsx")
+```
+
+### Step 4: Destroy the scraper
+
+```r
+lihkg$finalize()
+```
 
 ## Known Issues / To-do List
 
 * Create R package using devtools
-* Create arguments for specifying file outputs.
 * Debug error scrapping empty last page
 
 ## Contributors
