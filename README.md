@@ -6,6 +6,7 @@ The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of
 `lihkgr.R` contains all the required functions. Please install the following packages: `RSelenium`, `raster`, `magrittr` `rvest`, and `purrr`. Follow the following workflow:
 
 ### Step 1: Create a scraper
+For `RSelenium` to work, you need to specify the browser. If you are using Chrome, you need to also specify the version. For example,`create_lihkg(browser = "chrome", chromever = "83.0.4103.39")`. If a version is not supplied, by default it will run the most recent version. To see Chrome version currently sourced run `binman::list_versions("chromedriver")`.
 
 ```r
 ## Creating a Firefox instance with a random port.
@@ -16,7 +17,7 @@ lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1), verbos
 ### Step 2: Scrape
 
 ```r
-lihkg$scrape(1891333)
+lihkg$scrape(2091171)
 lihkg$scrape_alot(1610753:1610755)
 ```
 
@@ -28,12 +29,17 @@ lihkg$retry()
 
 ### Step 3: Get / Save the data
 
+To obtain the dataframe:
 ```r
 lihkg$bag
+```
+
+To save as .RDS:
+```r
 lihkg$save("lihkg.RDS")
-
-### If you don't want to save the data as RDS, you can just save the bag as any format you like. It is just a regular data frame / tibble.
-
+```
+If you don't want to save the data as RDS, you can just save the bag as any format you like. It is just a regular data frame / tibble：
+```r
 rio::export(lihkg$bag, "lihkg.xlsx")
 ```
 
@@ -45,7 +51,6 @@ lihkg$finalize()
 
 ## Known Issues / To-do List
 
-* Create R package using devtools
 * Debug error scrapping empty last page
 
 ## Contributors

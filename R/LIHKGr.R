@@ -1,15 +1,3 @@
-#########
-### R6 version
-require(R6)
-require(purrr)
-require(tibble) # >= 3.0.3
-require(dplyr)
-library(RSelenium)
-library(raster)
-library(magrittr)
-library(rvest)
-require(xml2)
-
 .lay_low <- function(){
   Sys.sleep(sample(seq(1, 2, by=0.001), 1))
 }
@@ -106,7 +94,7 @@ require(xml2)
         html <- .crack_it(paste0("https://lihkg.com/thread/", postid, "/page/", i), remote_driver)
         next.page <- html %>% rvest::html_node("._3omJTNzI7U7MErH1Cfr3gE+ ._3omJTNzI7U7MErH1Cfr3gE a") %>% rvest::html_text()
         titlewords <- html %>% rvest::html_nodes("._2k_IfadJWjcLJlSKkz_R2- span") %>% rvest::html_text() %>% length()
-        if ("下一頁" %in% next.page){
+        if ("\u4e0b\u4e00\u9801" %in% next.page){
             .print_v(paste0("page ", i, " (to be continued)"),  verbose = verbose)
             post <- .scrape_page(html, postid)
             posts <- dplyr::bind_rows(posts, post)
@@ -178,7 +166,7 @@ Lihkg_reader <- R6::R6Class(
         },
         finalize = function() {
             private$remote_driver$close()
-            private$driver[["server"]]$stop()            
+            private$driver[["server"]]$stop()
         },
         bag = tibble::tibble()
         ),
@@ -201,24 +189,3 @@ Lihkg_reader <- R6::R6Class(
 create_lihkg <- function(..., verbose = FALSE) {
     Lihkg_reader$new(..., verbose = FALSE)
 }
-
-### This method of using ... is better because some people (actually a lot of people) are using selenium inside Docker. So that they don't need to be restricted with only running it on their own machine.
-
-lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1), verbose = FALSE)
-require(magrittr)
-lihkg$scrape(1891333)
-### the bag is now public.
-lihkg$bag
-
-### Reproduce the original one.
-### TODO: mock a test for failed scraping.
-lihkg$scrape_alot(1610753:1610755)
-
-lihkg$bag %>% print(n = 1000)
-
-### IF there is anything missed, one can do this. (Haven't tested.)
-lihkg$retry()
-
-lihkg$save("lihkg.RDS")
-
-lihkg$finalize()
