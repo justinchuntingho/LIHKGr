@@ -17,3 +17,8 @@ a lihkg scraper
 \description{
 This function creates a lihkg scraper
 }
+\examples{
+\dontrun{
+lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1))
+}
+}

@@ -2,7 +2,6 @@
   Sys.sleep(sample(seq(1, 2, by=0.001), 1))
 }
 
-
 .gen_remote_driver <- function(...) {
     driver <- RSelenium::rsDriver(...)
     remote_driver <- driver[["client"]]
@@ -31,6 +30,7 @@
     return(pg)
 }
 
+#' @importFrom magrittr %>%
 .scrape_page <- function(html, postid){
     ##get_number
     number <- html %>% rvest::html_nodes("._36ZEkSvpdj_igmog0nluzh") %>%
@@ -80,6 +80,7 @@
     }
 }
 
+#' @importFrom magrittr %>%
 .scrape_post <- function(postid, remote_driver, verbose) {
   posts <- tibble::tibble()
   for(i in 1:999){
@@ -185,6 +186,10 @@ Lihkg_reader <- R6::R6Class(
 #' @param ... parameters to be passed to RSelenium::rsDriver(). For example, you can use create_lihkg(browser = "firefox", port = sample(10000:60000, 1)) to generate a Selenium instance of Firefox.
 #' @param verbose logical, whether debug information is printed out.
 #' @return a lihkg scraper
+#' @examples
+#' \dontrun{
+#' lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1))
+#' }
 #' @export
 create_lihkg <- function(..., verbose = FALSE) {
     Lihkg_reader$new(..., verbose = FALSE)
