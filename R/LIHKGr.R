@@ -142,13 +142,10 @@ Lihkg_reader <- R6::R6Class(
             private$driver <- res[[1]]
             private$verbose <- verbose
         },
-        scrape = function(postid) {
-            self$bag <- rbind(self$bag, .scrape_post(postid, private$remote_driver, private$verbose))
-        },
         save = function(file_name) {
             saveRDS(self$bag, file_name)
         },
-        scrape_alot = function(postids) {
+        scrape = function(postids) {
             res <- purrr::map(postids, purrr::safely(.scrape_post), remote_driver = private$remote_driver, verbose = private$verbose)
             failed_ids <- postids[!purrr::map_lgl(purrr::map(res, "error"), is.null)]
             if (length(failed_ids) >= 1) {

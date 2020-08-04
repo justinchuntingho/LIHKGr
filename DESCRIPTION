@@ -1,6 +1,6 @@
 Package: LIHKGr
 Title: Scrape Text Data from LIHKG
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
     person(given = "Justin Chun-ting",
            family = "Ho",

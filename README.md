@@ -22,8 +22,15 @@ lihkg <- create_lihkg(browser = "firefox", port = sample(10000:60000, 1), verbos
 ### Step 2: Scrape
 
 ```r
+# It can accept a single post id
 lihkg$scrape(2091171)
-lihkg$scrape_alot(1610753:1610755)
+
+# Or a vector
+lihkg$scrape(1610753:1610755)
+
+# Another way to do it
+postids <- c(1610753, 2091171)
+lihkg$scrape(postids)
 ```
 
 ### Step 2.1: If any post id cannot be scraped, retry
@@ -53,10 +60,6 @@ rio::export(lihkg$bag, "lihkg.xlsx")
 ```r
 lihkg$finalize()
 ```
-
-## Known Issues / To-do List
-
-* Debug error scrapping empty last page
 
 ## Contributors
 
