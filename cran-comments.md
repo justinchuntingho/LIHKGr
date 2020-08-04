@@ -5,3 +5,7 @@
 
 ## R CMD check results
 There were no ERRORs, WARNINGs, or NOTEs. 
+
+## Changes before resubmission
+* Added single quote for software names in the Description field.
+* Removed LICENSE file
