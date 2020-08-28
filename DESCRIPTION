@@ -7,8 +7,10 @@ Authors@R:
            role = c("aut", "cre"),
            email = "Justin.Ho@ed.ac.uk",
            comment = c(ORCID = "0000-0002-7884-1059"))
-Description: The goal of 'LIHKGr' is to scrape text data from LIHKG, the Hong Kong version of Reddit. LIHKG is currently protected by Google's 'reCAPTCHA', this package currently builds on 'RSelenium' and adopts a semi-manual approach to bypass it.
+Description: The goal of 'LIHKGr' is to scrape text data from LIHKG (<https://lihkg.com/>), the Hong Kong version of Reddit. LIHKG is currently protected by Google's 'reCAPTCHA', this package currently builds on 'RSelenium' and adopts a semi-manual approach to bypass it.
 License: GPL-3
+URL: https://github.com/justinchuntingho/LIHKGr
+BugReports:	https://github.com/justinchuntingho/LIHKGr/issues
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

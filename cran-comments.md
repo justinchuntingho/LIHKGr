@@ -9,3 +9,5 @@ There were no ERRORs, WARNINGs, or NOTEs.
 ## Changes before resubmission
 * Added single quote for software names in the Description field.
 * Removed LICENSE file
+* Added link to the used website to the Description field.
+* Added URL field and BugReports field.
