@@ -1,3 +1,10 @@
+![](https://www.r-pkg.org/badges/version-last-release/LIHKGr)
+![](https://cranlogs.r-pkg.org/badges/grand-total/LIHKGr)
+
+
+
+
+
 
 # LIHKGr <img src="man/figures/lihkgr.png" align="right" height="200" />
 The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of Reddit, for analysis. LIHKG has gained popularity in 2016 and become a popular research data source during recent years. LIHKG is currently protected by Google's reCAPTCHA, this package currently builds on `RSelenium` and adopts a semi-manual approach to bypass it.
