@@ -12,7 +12,7 @@ The goal of LIHKGr is to scrape text data on the LIHKG, the Hong Kong version of
 
 ## Installation
 ```r
-devtools::install_github("justinchuntingho/LIHKGr")
+install.packages("LIHKGr")
 ```
 
 ## Instructions
