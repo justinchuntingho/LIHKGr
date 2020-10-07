@@ -1,5 +1,6 @@
 ![](https://www.r-pkg.org/badges/version-last-release/LIHKGr)
 ![](https://cranlogs.r-pkg.org/badges/grand-total/LIHKGr)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
 
